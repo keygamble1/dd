@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-3">
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="content" class="form-label">답변내용</label>
+                <textarea name="content" id="content" class="form-control" rows="10">{{form.content.value|default_if_none:''}}</textarea>
+                {% comment %} answer을 form에전달해서 현재 내용을알수있음 form.content.value형식으로 {% endcomment %}
+            </div>
+            <button type="submit"  class="btn btn-primary">저장하기</button>
+        </form>
+</div>
+
+
+
+{% endblock  %}

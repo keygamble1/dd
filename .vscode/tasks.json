@@ -1,0 +1,25 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run Django Server",
+            "type": "shell",
+            "command": "python manage.py runserver",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Django Shell",
+            "type": "shell",
+            "command": "python manage.py shell",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "problemMatcher": []
+        }
+    ]
+}

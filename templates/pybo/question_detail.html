@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% load pybo_filter %}
+{% block content %}
+{% comment %} card는 이미지 텍스트 버튼 링크등 다 활용가능 img h5 p a 등다 가능 {% endcomment %}
+<div class="container my-3">
+    {% if messages %}
+    <div class="alert alert-danger my-3" role="alert">
+    {% for message in messages %}
+        <strong>{{message.tags}} </strong>
+        <ul><li>{{message.message}} </li></ul>
+        {% comment %} ul은 unorder list ,li=list item {% endcomment %}
+    {% endfor %}
+</div>
+    {% endif %}
+    {% comment %} setting에서 template에 message가 포함됨 {% endcomment %}
+    <h2 border-bottom py-2>{{question.subject}} </h2>
+        <div class="card my-3">
+            <div class="card-body">
+                {% comment %} card-body 컨텐츠 포함부분 {% endcomment %}
+                <div class="card-text">{{question.content|mark}}</div>
+                {% comment %} d-flex display속성설정요소->flexvbox로 justify-content-end 오른쪽으로 정렬 {% endcomment %}
+                <div class="d-flex justify-content-end">
+                    
+
+                    {% if question.modify_date %}
+                    <div class="badge bg-light text-dark p-2 text-start mx-3">
+                        <div class="mb-2">modified at</div>
+                        <div>{{ question.modify_date }}</div>
+                    </div>
+                    {% endif %}
+
+                    <div class="badge bg-light text-dark p-2 text-start">
+                        <div class="mb-2">{{question.author.username}} </div>
+                        <div>{{ question.create_date}}</div>
+                    </div>
+                </div>
+                <div class="my-3">
+                    <a href="javascript:void(0)" data-uri="{% url 'pybo:question_vote' question.id %}"
+                    class="recommend btn btn-sm btn-outline-secondary"
+                     >추천
+                    <span class="badge rounded-pill bg-success" >{{question.voter.count}} </span>
+                    </a>
+                    {% if request.user == question.author %}
+                    {% comment %} url은 딕셔너리형태로 쓰는거고 name으로 찾는거기때문에
+                    무조건 딕셔너리형태로 url을 받아와야함 {% endcomment %}
+
+                        <a href="{% url 'pybo:question_modify' question.id %}"
+                        class="btn btn-sm btn-outline-secondary">수정</a>
+                        <a href="javascript:void(0)" class="delete btn btn-sm btn-outline-secondary"
+                        data-uri="{% url 'pybo:question_delete' question.id %}"
+                        {% comment %} data중 url를 넣음 {% endcomment %}
+                        >삭제</a>
+                    {% endif %}
+                    
+                </div>
+            </div>
+        </div>
+        {% comment %} 모델.역참조하려면 context.model의 소문자형_set {% endcomment %}
+        <h5 class="border-bottom my-3 py-2">{{question.answer_set.count}}개의 답변 </h5>
+        {% for answer in  question.answer_set.all %} 
+        <a id="answer_{{answer.id}} "></a>
+        {% comment %} <a id>는 앵커테그를위한 것 answer.id=18이면 id=answer_17임 {% endcomment %}
+        {% comment %} 역참조메서드 all,count,filter(모든객체),get(1개),exclude(관계객체제외)
+        order_by,annoate추가정보추가 values() 특정값 필드('id,answertext'),update 
+        Question.objects의 메서드와 같다{% endcomment %}
+        <div class="card my-3">
+                <div class="card-body">
+                    <div class="card-text">{{ answer.content|mark }}</div>
+                    <div class="d-flex justify-content-end">
+                        {% if answer.modify_date  %}
+                        
+                        <div class="badge bg-light text-dark p-2 text-start">
+                            <div class="mb-2">{{question.author.username}} </div>
+                            <div>{{answer.modify_date }}</div>
+                        </div>
+                        {% endif %}
+
+                        <div class="badge bg-light text-dark p-2 text-start">
+                            <div class="mb-2">{{question.author.username}} </div>
+                            <div>{{answer.create_date }}</div>
+                        </div>
+                    </div>
+                    <div class="my-3">
+                        <a href="javascript:void(0)" data-uri="{% url 'pybo:answer_vote' answer.id %}"
+                        class="recommend btn btn-sm btn-outline-secondary"
+                        >추천
+                        <span class="badge rounded-pill bg-success">{{answer.voter.count}} </span>
+                    </a>
+                        {% if request.user == answer.author %}
+                        <a href="{% url 'pybo:answer_modify' answer.id %}"
+                        class="btn btn-sm btn-outline-secondary"
+                        >수정</a>
+                        <a href="#"
+                        class="delete btn btn-sm btn-outline-secondary"
+                        data-uri="{% url 'pybo:answer_delete' answer.id %}"
+                        >삭제</a>
+
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}     
+            <form action="{% url 'pybo:answer_create' question.id %}" method="post" class="my-3">
+                {% if  form.errors %}
+                <div class= "alert alert-danger" role="alert">
+                        {% for field in  form %}
+                        {% if field.errors %}
+                        {% comment %} error가났다는건 model이 null이있다는것 {% endcomment %}
+                        <div>
+                            <strong>{{field.label}} </strong>
+                            {{field.errors}}
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+
+                </div>
+                {% endif %}
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="content" class="form-label">답변내용</label>
+
+                {% comment %} 답변내용클릭시 textare로 포커스 이동 {% endcomment %}
+                    <textarea {% if not user.is_authenticated  %}disabled{% endif %}
+                    name="content" id="content" class="form-control" rows="10"></textarea>
+                    {% comment %} id는 css name은 view에 전달 {% endcomment %}
+                    {% comment %} form-label이나 form-control은 모델 불러오는것과 관련없고 그냥 부트스트랩임 {% endcomment %}
+                    <input type="submit" value="답변등록" class="btn btn-primary">
+                </div>
+                </form>
+</div>  
+
+{% endblock  %}
+
+{% block script %}
+<script type="text/javascript">
+const delete_elements=document.getElementsByClassName("delete");
+Array.from(delete_elements).forEach(function(element){
+    element.addEventListener('click',function(){
+        if(confirm('정말삭제?')){
+         location.href=this.dataset.uri;   
+         
+        }
+        
+
+    });
+
+});
+const recommend_eleemnts=document.getElementsByClassName('recommend');
+Array.from(recommend_eleemnts).forEach(function(element){
+    element.addEventListener('click',function(){
+        if(confirm("정말추천?")){
+            location.href=this.dataset.uri;
+            
+        }
+    });
+
+});
+{% comment %} this.dataset  가져오라는뜻 폼에서 {% endcomment %}
+{% comment %} 팝업창만나와도됨 아직 url에 연결안시켰으므로 {% endcomment %}
+{% comment %} 일단먼저 class찾고 array.from에서 찾은걸 순환한다음 classname찾은거의 속성을 다 찾기위해 
+foreach를 씀 function(element를함) {% endcomment %}
+{% comment %} dataset(data-url)중의 url을 호출하라  {% endcomment %}
+
+{% comment %} if는 대신 세미콜론 {% endcomment %}
+{% comment %} (){}는 블록이들어가기때문에 ;로안묶음 {% endcomment %}
+{% comment %} foreach 메서드 ; % endcomment %}
+{% comment %} 블록의 시작과 끝은 세콜론x 문장끝 세미콜론 ㅇ ()괄호가 끝임 {% endcomment %}
+</script>
+
+{% endblock  %}
+{% comment %} url넣고 매개변수는 그옆에 넣는다 {% endcomment %}
+
+{% comment %} csrf 토큰을 세션통해서 발행후 폼+토큰을 전달, 그럼 웹페이지에서 토큰 하는 과정 {% endcomment %}

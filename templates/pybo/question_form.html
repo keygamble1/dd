@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h5 class="my-3 border-bottom pb-2">질문등록</h5>
+        <form method="post" >
+            {% comment %} action을주면 그 url view만가능하고 다른건 불가능하기때문에
+            수정하려면 action빼는게나음 {% endcomment %}
+            {% csrf_token %}
+            {% if form.errors %}
+            <div class= "alert alert-danger" role="alert">
+
+                {% comment %} form의 요소들을 field로 정의
+                field는 errors와 label 다 가질수있음  {% endcomment %}
+                {% for field  in  form %}
+                {% if field.errors %}
+                    <strong>{{field.label}} </strong>
+                    {{field.errors}}
+                {% endif %}
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <div class="mb-3">
+                <label for="subject" class="form-label">제목</label>
+                <input type="text" class="form-control" name="subject" id="subject"
+                value="{{form.subject.value|default_if_none:""}}">
+            </div>
+            <div class="mb-3">
+                <label for="content" class="form-label">내용</label>
+                <textarea class="form-control" name="content" id="content" rows="10"
+                >{{form.content.value|default_if_none:''}}</textarea>
+            </div>
+            {% comment %} subject,content charfield textfield타입자동설정 {% endcomment %}
+            {% comment %} form태그에 action을안넣어줌
+            보통은 action속성지정후 submit 실행시 url로 폼을전송해야하는게맞음
+            하지만 현재에서는 action을 지정안해서 디폴트 액션으로 지정함
+            action="{% url 'pybo:question_create' %}" 로해도됨             {% endcomment %}
+            <button type="submit" class="btn btn-primary">저장하기</button>
+        </form>
+</div>
+
+{% endblock  %}

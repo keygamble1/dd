@@ -1,0 +1,25 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <link rel="stylesheet" type="text/css" href="{% static 'bootstrap.min.css' %}">
+
+
+    <title>파이보변경</title>
+</head>
+<body>
+    {% comment %} 기본템플릿시작 {% endcomment %}
+
+{% include "navbar.html" %}
+{% block content %}
+{% endblock %}
+<script src={% static 'bootstrap.min.js' %}></script>
+
+{% block script %}
+
+{% endblock  %}
+{% comment %} 기본템플릿끝 {% endcomment %}
+</body>
+</html>

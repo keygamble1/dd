@@ -1,0 +1,36 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{% url 'pybo:index' %} ">Pybo</a>
+        <button class="navbar-toggler" type="button" 
+        data-bs-toggle="collapse" 
+        {% comment %} bs들어가면 부트스트랩5 자바스크립트 속성뜻함 {% endcomment %}
+        data-bs-target="#collapsibleNavId" 
+        aria-controls="collapsibleNavId"
+            aria-expanded="false" 
+            aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="collapsibleNavId">
+            <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+                {% comment %} 인증이되었따면 django.contrib.auth기능을 사용해서 
+                폼 User객체의 user를 쓰는게가능 {% endcomment %}
+                {% if  user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'common:logout' %}">{{user.username}} (로그아웃) </a>
+                </li>
+
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'common:login' %}">로그인</a>
+                </li>
+                <li class="nav-item">
+                    {% if not user.is_authenticated %}
+                    {% comment %} get용 {% endcomment %}
+                    <a class="nav-link" href="{% url 'common:signup' %}">회원가입</a>
+                    {% endif %}
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
